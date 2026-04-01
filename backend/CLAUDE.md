@@ -8,7 +8,7 @@ DeerFlow is a LangGraph-based AI super agent system with a full-stack architectu
 
 **Architecture**:
 - **LangGraph Server** (port 2024): Agent runtime and workflow execution
-- **Gateway API** (port 8001): REST API for models, MCP, skills, memory, artifacts, uploads, and local thread cleanup
+- **Gateway API** (port 8001): REST API for models, MCP, skills, memory, artifacts, uploads, local thread cleanup, and multi-tenant admin (organization hierarchy + RBAC)
 - **Frontend** (port 3000): Next.js web interface
 - **Nginx** (port 2026): Unified reverse proxy entry point
 - **Provisioner** (port 8002, optional in Docker dev): Started only when sandbox is configured for provisioner/Kubernetes mode
@@ -198,6 +198,8 @@ Configuration priority:
 
 FastAPI application on port 8001 with health check at `GET /health`.
 
+Multi-tenant admin data storage is configured via `DEER_FLOW_TENANCY_DATABASE_URL` (default `postgresql+psycopg://deerflow:deerflow@localhost:5432/deerflow`).
+
 **Routers**:
 
 | Router | Endpoints |
@@ -210,6 +212,7 @@ FastAPI application on port 8001 with health check at `GET /health`.
 | **Threads** (`/api/threads/{id}`) | `DELETE /` - remove DeerFlow-managed local thread data after LangGraph thread deletion; unexpected failures are logged server-side and return a generic 500 detail |
 | **Artifacts** (`/api/threads/{id}/artifacts`) | `GET /{path}` - serve artifacts; active content types (`text/html`, `application/xhtml+xml`, `image/svg+xml`) are always forced as download attachments to reduce XSS risk; `?download=true` still forces download for other file types |
 | **Suggestions** (`/api/threads/{id}/suggestions`) | `POST /` - generate follow-up questions; rich list/block model content is normalized before JSON parsing |
+| **Admin** (`/api/admin`) | organizations, departments, users, roles, permissions, grants, and access matrix for multi-tenant RBAC (PostgreSQL tables prefixed with `tenant_`) |
 
 Proxied through nginx: `/api/langgraph/*` → LangGraph, all other `/api/*` → Gateway.
 

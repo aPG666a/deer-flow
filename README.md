@@ -628,3 +628,17 @@ Your unwavering commitment and expertise have been the driving force behind Deer
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=bytedance/deer-flow&type=Date)](https://star-history.com/#bytedance/deer-flow&Date)
+
+
+## Multi-tenant Admin (PostgreSQL)
+
+Gateway now includes a multi-tenant administration API at `/api/admin/*` for:
+
+- Organization management
+- Department tree management
+- Tenant user management
+- Role and permission management
+- User-role / role-permission / user-department grants
+- Organization access matrix query
+
+Set `DEER_FLOW_TENANCY_DATABASE_URL` (default: `postgresql+psycopg://deerflow:deerflow@localhost:5432/deerflow`).

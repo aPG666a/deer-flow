@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from app.gateway.config import get_gateway_config
 from app.gateway.deps import langgraph_runtime
 from app.gateway.routers import (
+    admin_tenant,
     agents,
     artifacts,
     assistants_compat,
@@ -22,6 +23,7 @@ from app.gateway.routers import (
     uploads,
 )
 from deerflow.config.app_config import get_app_config
+from app.gateway.tenancy.db import init_tenancy_db
 
 # Configure logging
 logging.basicConfig(
@@ -49,6 +51,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info(f"Starting API Gateway on {config.host}:{config.port}")
 
     # Initialize LangGraph runtime components (StreamBridge, RunManager, checkpointer, store)
+    await init_tenancy_db()
+
     async with langgraph_runtime(app):
         logger.info("LangGraph runtime initialised")
 
@@ -149,6 +153,10 @@ This gateway provides custom endpoints for models, MCP configuration, skills, an
                 "description": "Manage IM channel integrations (Feishu, Slack, Telegram)",
             },
             {
+                "name": "admin",
+                "description": "Multi-tenant organization, RBAC, and admin governance APIs backed by PostgreSQL",
+            },
+            {
                 "name": "assistants-compat",
                 "description": "LangGraph Platform-compatible assistants API (stub)",
             },
@@ -189,6 +197,9 @@ This gateway provides custom endpoints for models, MCP configuration, skills, an
 
     # Agents API is mounted at /api/agents
     app.include_router(agents.router)
+
+    # Multi-tenant admin API is mounted at /api/admin
+    app.include_router(admin_tenant.router)
 
     # Suggestions API is mounted at /api/threads/{thread_id}/suggestions
     app.include_router(suggestions.router)

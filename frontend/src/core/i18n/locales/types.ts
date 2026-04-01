@@ -111,6 +111,7 @@ export interface Translations {
     chats: string;
     demoChats: string;
     agents: string;
+    admin: string;
   };
 
   // Agents
