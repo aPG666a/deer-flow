@@ -113,18 +113,9 @@ async def grant_user_department(payload: UserDepartmentGrant, session: AsyncSess
 @router.get("/organizations/{organization_id}/access-matrix")
 async def get_access_matrix(organization_id: str, session: AsyncSession = Depends(get_tenancy_session)) -> dict:
     users = (await session.scalars(select(User).where(User.organization_id == organization_id))).all()
-    user_role_rows = (
-        await session.execute(
-            select(UserRole.user_id, Role.code).join(Role, Role.id == UserRole.role_id).where(Role.organization_id == organization_id)
-        )
-    ).all()
+    user_role_rows = (await session.execute(select(UserRole.user_id, Role.code).join(Role, Role.id == UserRole.role_id).where(Role.organization_id == organization_id))).all()
     role_perm_rows = (
-        await session.execute(
-            select(Role.code, Permission.code)
-            .join(RolePermission, RolePermission.permission_id == Permission.id)
-            .join(Role, Role.id == RolePermission.role_id)
-            .where(Role.organization_id == organization_id)
-        )
+        await session.execute(select(Role.code, Permission.code).join(RolePermission, RolePermission.permission_id == Permission.id).join(Role, Role.id == RolePermission.role_id).where(Role.organization_id == organization_id))
     ).all()
 
     role_permissions: dict[str, list[str]] = {}
