@@ -51,7 +51,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info(f"Starting API Gateway on {config.host}:{config.port}")
 
     # Initialize LangGraph runtime components (StreamBridge, RunManager, checkpointer, store)
-    await init_tenancy_db()
+    try:
+        await init_tenancy_db()
+    except Exception:
+        logger.exception("Tenancy DB initialization failed; continuing startup without admin tenancy DB")
 
     async with langgraph_runtime(app):
         logger.info("LangGraph runtime initialised")
