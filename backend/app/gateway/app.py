@@ -22,8 +22,8 @@ from app.gateway.routers import (
     threads,
     uploads,
 )
-from deerflow.config.app_config import get_app_config
 from app.gateway.tenancy.db import init_tenancy_db
+from deerflow.config.app_config import get_app_config
 
 # Configure logging
 logging.basicConfig(
